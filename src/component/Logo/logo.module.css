@@ -1,0 +1,11 @@
+.navbarlogo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .navbarlogo:hover {
+    transform: scale(1.1);
+  }
+  

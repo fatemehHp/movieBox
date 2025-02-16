@@ -1,0 +1,14 @@
+.navbarSearch {
+    flex: 1;
+    margin: 0 2rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .navbarSearch:focus {
+    box-shadow: 0 0 10px #e50914;
+  }
