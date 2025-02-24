@@ -1,0 +1,35 @@
+.movieItem {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding: 20px 0px
+  }
+  
+  .movieItemImage {
+    width: 60px;
+    height: 90px;
+    border-radius: 5px;
+    background-color: #ddd;
+    margin-right: 1rem;
+  }
+  
+  .movieItemInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .movieItemTitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .movieItemDate {
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  

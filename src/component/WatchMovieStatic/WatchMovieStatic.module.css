@@ -1,0 +1,24 @@
+.watchedMoviesHeader {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+}
+.movieItemTitle{
+    margin-right: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+.movieItemInfo{
+    display: flex
+    ;
+        gap: 0.5rem;
+    }
+    .rate{
+        color: #e63946;
+        font-weight: bold;
+    }
+    .runTime{
+        color: #1d3557;
+    }

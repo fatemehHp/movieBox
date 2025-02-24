@@ -1,56 +1,88 @@
-import React from "react";
+import React, { useEffect, useReducer } from "react";
 import Header from "./component/Header/Header";
+import Main from "./component/Main/Main";
+import MovieSection from "./component/MovieSection/MovieSection";
+import MovieList from "./component/MovieList/MovieList";
+import WatchedMovieItem from "./component/WatchedMovieItem/WatchedMovieItem";
+import MovieItem from "./component/MovieItem/MovieItem";
+import WatchMovieStatic from "./component/WatchMovieStatic/WatchMovieStatic";
+import Button from "./component/Button/Button";
+import Error from "./component/Error/Error";
+import "./index.css";
+import Loading from "./component/Loading/Loading";
+
+const ApiKey="2560eeb2"
+const initialState = {
+  // open 1,2
+  closeMovieList: false,
+  closeWatchedList:false,
+  status: "loading",
+  movieList:[]
+};
+function reducer(state, action) {
+  switch (action.type) {
+    case "closeMovieList":
+      return { ...state, closeMovieList: !state.closeMovieList };
+    case "closeWatchedList":
+      return { ...state, closeWatchedList: !state.closeWatchedList };
+    case "dataLoading":
+      return { ...state, status:"dataLoading"};
+      case "resiveData":
+        return { ...state, movieList:action.payload,status:"resiveData"};
+    case "dataFeild":
+      return { ...state, status:"dataFeild"};
+  
+    default:
+      throw new Error("not found");
+  }
+}
 
 const App = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {closeMovieList, closeWatchedList,status,movieList } = state;
+  // fetchData
+  useEffect(function(){
+    async function fetchData() {
+      try{
+        dispatch({type:"dataLoading"})
+        const response=await fetch(`http://www.omdbapi.com/?apikey=${ApiKey}&s=interstellar`)
+        if (!response.ok){
+          throw new Error("can not found page")
+        }
+        const data=await response.json()
+        dispatch({type:"resiveData",payload:data.Search})
+      }
+      catch(er){
+        dispatch({type:"dataFeild"})
+      }
+    }
+    fetchData()
+  },[])
   return (
     <>
-  <Header/>
-      <main>
-        <div className="container">
-         <div className="box movie">
-          <button>show</button>
-          <ul className="list-box">
-            <li className="movie-item">
-              <img src="" alt="" />
-              <div className="movie-item-info">
-                <h3 className="movieTitle">mpvie title</h3>
-                <h6 className="moviePublishDate">
-                  <span>icon</span>
-                  2012
-                </h6>
-              </div>
-            </li>
-          </ul>
-         </div>
-         <div className="box watchMovie">
-         <button>show</button>
-          <div className="watchedMovieHeader">
-            <h3 className="movieTitle">movie you watched</h3>
-            <div className="">
-              <span>2 movies</span>
-              <span className="rate">8.56</span>
-              <span className="rate">9.56</span>
-              <span className="runTime">10 min</span>
-            </div>
+      <Header />
+      <Main>
+        {/* Movie Section */}
+        <MovieSection>
+          <Button dispatch={()=>dispatch({type:"closeMovieList"})}>x</Button>
+        
+              {
+                !closeMovieList && (
+                  status==="dataLoading"?<Loading/>:
+                  status==="dataFeild"?<Error/>:
+                  status==="resiveData" ? <MovieList movieList={movieList}/>:null
 
-          </div>
-          <ul className="list-box">
-
-          <li className="movie-item">
-
-              <img src="" alt="" />
-              <div className="movie-item-info">
-                <h3 className="movieTitle">mpvie title</h3>
-              <span className="rate">8.56</span>
-              <span className="rate">9.56</span>
-              <span className="runTime">10 min</span>
-              </div>
-            </li>
-          </ul>
-         </div>
-        </div>
-      </main>
-      <footer></footer>
+                )
+              }
+        </MovieSection>
+        {/* Watched Movies Section */}
+        <MovieSection>
+          <Button dispatch={()=>dispatch({type:"closeWatchedList"})}>x</Button>
+          {!closeWatchedList ? (
+<p>name</p>
+          ) : null}
+        </MovieSection>
+      </Main>
     </>
   );
 };
