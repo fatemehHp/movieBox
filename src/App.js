@@ -1,23 +1,23 @@
-import React, { useEffect, useReducer } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
 import Header from "./component/Header/Header";
 import Main from "./component/Main/Main";
 import MovieSection from "./component/MovieSection/MovieSection";
 import MovieList from "./component/MovieList/MovieList";
-import WatchedMovieItem from "./component/WatchedMovieItem/WatchedMovieItem";
-import MovieItem from "./component/MovieItem/MovieItem";
-import WatchMovieStatic from "./component/WatchMovieStatic/WatchMovieStatic";
+import SearchContext from "./component/Context/ContextSearch";
 import Button from "./component/Button/Button";
-import Error from "./component/Error/Error";
+import ErrorMessage from "./component/Error/ErrorMessage";
 import "./index.css";
 import Loading from "./component/Loading/Loading";
 
-const ApiKey="2560eeb2"
+const ApiKey = "2560eeb2";
 const initialState = {
   // open 1,2
   closeMovieList: false,
-  closeWatchedList:false,
+  closeWatchedList: false,
   status: "loading",
-  movieList:[]
+  errorMessage: "",
+  movieList: [],
+  searchInput: "",
 };
 function reducer(state, action) {
   switch (action.type) {
@@ -26,12 +26,16 @@ function reducer(state, action) {
     case "closeWatchedList":
       return { ...state, closeWatchedList: !state.closeWatchedList };
     case "dataLoading":
-      return { ...state, status:"dataLoading"};
-      case "resiveData":
-        return { ...state, movieList:action.payload,status:"resiveData"};
-    case "dataFeild":
-      return { ...state, status:"dataFeild"};
-  
+      return { ...state, status: "dataLoading" };
+    case "receiveData":
+      return { ...state, movieList: action.payload, status: "receiveData" };
+    case "resetData":
+      return { ...state, movieList: [], status: "resetData" };
+    case "dataFailed ":
+      return { ...state, status: "dataFailed ", errorMessage: action.payload };
+    case "onchangeQuery":
+      return { ...state,searchInput:action.payload  };
+
     default:
       throw new Error("not found");
   }
@@ -39,48 +43,67 @@ function reducer(state, action) {
 
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const {closeMovieList, closeWatchedList,status,movieList } = state;
+  const {
+    closeMovieList,
+    closeWatchedList,
+    status,
+    movieList,
+    errorMessage,
+    searchInput,
+  } = state;
   // fetchData
-  useEffect(function(){
+  useEffect(function () {
     async function fetchData() {
-      try{
-        dispatch({type:"dataLoading"})
-        const response=await fetch(`http://www.omdbapi.com/?apikey=${ApiKey}&s=interstellar`)
-        if (!response.ok){
-          throw new Error("can not found page")
+      try {
+        if(searchInput.length<3){
+          dispatch({type:"resetData"})
+          return
         }
-        const data=await response.json()
-        dispatch({type:"resiveData",payload:data.Search})
-      }
-      catch(er){
-        dispatch({type:"dataFeild"})
+        dispatch({ type: "dataLoading" });
+        const response = await fetch(
+          `http://www.omdbapi.com/?apikey=${ApiKey}&s=${searchInput}`
+        );
+        if (!response.ok) {
+          throw new Error("can not found page");
+        }
+        const data = await response.json();
+        if (data.Response === "False") {
+          throw new Error("Movie not found!");
+        }
+        dispatch({ type: "receiveData", payload: data.Search });
+      } catch (err) {
+        dispatch({ type: "dataFailed ", payload: err.message });
       }
     }
-    fetchData()
-  },[])
+    fetchData();
+  }, [searchInput]);
   return (
     <>
-      <Header />
+      <SearchContext.Provider value={{searchInput:searchInput,dispatch:dispatch}}>
+        <Header />
+      </SearchContext.Provider>
       <Main>
         {/* Movie Section */}
         <MovieSection>
-          <Button dispatch={()=>dispatch({type:"closeMovieList"})}>x</Button>
-        
-              {
-                !closeMovieList && (
-                  status==="dataLoading"?<Loading/>:
-                  status==="dataFeild"?<Error/>:
-                  status==="resiveData" ? <MovieList movieList={movieList}/>:null
+          <Button dispatch={() => dispatch({ type: "closeMovieList" })}>
+            {closeMovieList ? "-" : "x"}
+          </Button>
 
-                )
-              }
+          {!closeMovieList &&
+            (status === "dataLoading" ? (
+              <Loading />
+            ) : status === "dataFailed " ? (
+              <ErrorMessage errorMessage={errorMessage} />
+            ) : status === "receiveData" ? (
+              <MovieList movieList={movieList} />
+            ) : status==="resetData"?<p>search movie name</p>:null)}
         </MovieSection>
         {/* Watched Movies Section */}
         <MovieSection>
-          <Button dispatch={()=>dispatch({type:"closeWatchedList"})}>x</Button>
-          {!closeWatchedList ? (
-<p>name</p>
-          ) : null}
+          <Button dispatch={() => dispatch({ type: "closeWatchedList" })}>
+            {closeWatchedList ? "-" : "x"}
+          </Button>
+          {!closeWatchedList ? <p>name</p> : null}
         </MovieSection>
       </Main>
     </>

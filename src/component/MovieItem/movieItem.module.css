@@ -6,11 +6,12 @@
   }
   
   .movieItemImage {
-    width: 60px;
+    width: 100px;
     height: 90px;
     border-radius: 5px;
     background-color: #ddd;
     margin-right: 1rem;
+    object-fit: cover;
   }
   
   .movieItemInfo {
@@ -20,7 +21,7 @@
   }
   
   .movieItemTitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #333;
   }

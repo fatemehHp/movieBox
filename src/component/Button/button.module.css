@@ -5,6 +5,9 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size: 17px;
+    font-size: 20px;
     margin-left: 99%;
+  }
+.movieSectionButton:hover {
+color: red
   }
