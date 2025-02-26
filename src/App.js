@@ -8,6 +8,9 @@ import Button from "./component/Button/Button";
 import ErrorMessage from "./component/Error/ErrorMessage";
 import "./index.css";
 import Loading from "./component/Loading/Loading";
+import WatchMovieStatic from "./component/WatchMovieStatic/WatchMovieStatic";
+import WatchMovieList from "./component/WatchMovieList/WatchMovieList";
+import SelectedMovie from "./component/Context/SelectedMovieContext";
 
 const ApiKey = "2560eeb2";
 const initialState = {
@@ -18,6 +21,8 @@ const initialState = {
   errorMessage: "",
   movieList: [],
   searchInput: "",
+  selectMovie: "",
+  watchedMovie: [],
 };
 function reducer(state, action) {
   switch (action.type) {
@@ -34,7 +39,15 @@ function reducer(state, action) {
     case "dataFailed ":
       return { ...state, status: "dataFailed ", errorMessage: action.payload };
     case "onchangeQuery":
-      return { ...state,searchInput:action.payload  };
+      return { ...state, searchInput: action.payload };
+    case "selectMovie":
+      return {
+        ...state,
+        selectMovie: action.payload,
+        watchedMovie: action.value,
+      };
+    case "watchmovie":
+      return { ...state, watchedMovie: action.payload };
 
     default:
       throw new Error("not found");
@@ -50,60 +63,89 @@ const App = () => {
     movieList,
     errorMessage,
     searchInput,
+    selectMovie,
+    watchedMovie
   } = state;
+  const movieListLength = movieList.length;
   // fetchData
-  useEffect(function () {
-    async function fetchData() {
-      try {
-        if(searchInput.length<3){
-          dispatch({type:"resetData"})
-          return
+  useEffect(
+    function () {
+      const newAbrotController = new AbortController();
+      const { signal } = newAbrotController;
+      async function fetchData() {
+        try {
+          if (searchInput.length < 3) {
+            dispatch({ type: "resetData" });
+            return;
+          }
+          dispatch({ type: "dataLoading" });
+          const response = await fetch(
+            `http://www.omdbapi.com/?apikey=${ApiKey}&s=${searchInput}`,
+            { signal }
+          );
+          if (!response.ok) {
+            throw new Error("can not found page");
+          }
+          const data = await response.json();
+          if (data.Response === "False") {
+            throw new Error("Movie not found!");
+          }
+          dispatch({ type: "receiveData", payload: data.Search });
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            console.log(err.message);
+            dispatch({ type: "dataFailed ", payload: err.message });
+          }
         }
-        dispatch({ type: "dataLoading" });
-        const response = await fetch(
-          `http://www.omdbapi.com/?apikey=${ApiKey}&s=${searchInput}`
-        );
-        if (!response.ok) {
-          throw new Error("can not found page");
-        }
-        const data = await response.json();
-        if (data.Response === "False") {
-          throw new Error("Movie not found!");
-        }
-        dispatch({ type: "receiveData", payload: data.Search });
-      } catch (err) {
-        dispatch({ type: "dataFailed ", payload: err.message });
       }
-    }
-    fetchData();
-  }, [searchInput]);
+      fetchData();
+      return () => newAbrotController.abort();
+    },
+    [searchInput]
+  );
   return (
     <>
-      <SearchContext.Provider value={{searchInput:searchInput,dispatch:dispatch}}>
+      <SearchContext.Provider
+        value={{
+          searchInput: searchInput,
+          dispatch: dispatch,
+          movieListLength,
+        }}
+      >
         <Header />
       </SearchContext.Provider>
       <Main>
         {/* Movie Section */}
-        <MovieSection>
-          <Button dispatch={() => dispatch({ type: "closeMovieList" })}>
-            {closeMovieList ? "-" : "x"}
-          </Button>
+        <SelectedMovie.Provider value={{ dispatch }}>
+          <MovieSection>
+            <Button dispatch={() => dispatch({ type: "closeMovieList" })}>
+              {closeMovieList ? "-" : "x"}
+            </Button>
 
-          {!closeMovieList &&
-            (status === "dataLoading" ? (
-              <Loading />
-            ) : status === "dataFailed " ? (
-              <ErrorMessage errorMessage={errorMessage} />
-            ) : status === "receiveData" ? (
-              <MovieList movieList={movieList} />
-            ) : status==="resetData"?<p>search movie name</p>:null)}
-        </MovieSection>
+            {!closeMovieList &&
+              (status === "dataLoading" ? (
+                <Loading />
+              ) : status === "dataFailed " ? (
+                <ErrorMessage errorMessage={errorMessage} />
+              ) : status === "receiveData" ? (
+                <MovieList movieList={movieList} />
+              ) : status === "resetData" ? (
+                <p>search movie name</p>
+              ) : null)}
+          </MovieSection>
+        </SelectedMovie.Provider>
         {/* Watched Movies Section */}
         <MovieSection>
           <Button dispatch={() => dispatch({ type: "closeWatchedList" })}>
             {closeWatchedList ? "-" : "x"}
           </Button>
-          {!closeWatchedList ? <p>name</p> : null}
+
+          {!closeWatchedList && selectMovie ? (
+            <SelectedMovie.Provider value={{ dispatch }}>
+              <WatchMovieStatic />
+              <WatchMovieList selectMovie={selectMovie} dispatch={dispatch}  watchedMovie={watchedMovie}/>
+            </SelectedMovie.Provider>
+          ) : null}
         </MovieSection>
       </Main>
     </>
