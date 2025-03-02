@@ -54,6 +54,8 @@ function reducer(state, action) {
       };
     case "movieDetail":
       return { ...state, movieDetail: action.payload };
+    case "deleteDetail":
+      return { ...state, movieDetail: null};
 
     default:
       throw new Error("not found");
@@ -74,6 +76,7 @@ const App = () => {
     movieDetail,
   } = state;
   const movieListLength = movieList.length;
+  const movieWatched = watchedMovie.length;
   // fetchData
   useEffect(
     function () {
@@ -154,7 +157,7 @@ const App = () => {
                 <MovieDetails />
               ) : (
                 <>
-                  <WatchMovieStatic />
+                  <WatchMovieStatic movieWatched={movieWatched}/>
                   <WatchMovieList />
                 </>
               )}
