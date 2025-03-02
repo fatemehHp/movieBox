@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import styles from './watchedMovieItem.module.css'
-
+import SelectedMovie from "../Context/SelectedMovieContext";
 const WatchedMovieItem = ({watchedMovie}) => {
+  const {dispatch}=useContext(SelectedMovie)
   return (
-    <li className={styles.movieItem}>
+    <li className={styles.movieItem} onClick={()=>dispatch({type:"movieDetail" , payload:watchedMovie})} >
       <img src={watchedMovie.Poster} alt="Watched Movie Poster" className={styles.movieItemImage}/>
       <div className={styles.movieItemInfo}>
         <h3 className={styles.movieItemTitle}>{watchedMovie.Title}</h3>

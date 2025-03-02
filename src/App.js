@@ -11,6 +11,7 @@ import Loading from "./component/Loading/Loading";
 import WatchMovieStatic from "./component/WatchMovieStatic/WatchMovieStatic";
 import WatchMovieList from "./component/WatchMovieList/WatchMovieList";
 import SelectedMovie from "./component/Context/SelectedMovieContext";
+import MovieDetails from "./component/MovieDetails/MovieDetails";
 
 const ApiKey = "2560eeb2";
 const initialState = {
@@ -23,6 +24,7 @@ const initialState = {
   searchInput: "",
   selectMovie: "",
   watchedMovie: [],
+  movieDetail: null,
 };
 function reducer(state, action) {
   switch (action.type) {
@@ -44,10 +46,14 @@ function reducer(state, action) {
       return {
         ...state,
         selectMovie: action.payload,
-        watchedMovie: action.value,
       };
     case "watchmovie":
-      return { ...state, watchedMovie: action.payload };
+      return {
+        ...state,
+        watchedMovie: [...state.watchedMovie, action.payload],
+      };
+    case "movieDetail":
+      return { ...state, movieDetail: action.payload };
 
     default:
       throw new Error("not found");
@@ -64,7 +70,8 @@ const App = () => {
     errorMessage,
     searchInput,
     selectMovie,
-    watchedMovie
+    watchedMovie,
+    movieDetail,
   } = state;
   const movieListLength = movieList.length;
   // fetchData
@@ -139,13 +146,20 @@ const App = () => {
           <Button dispatch={() => dispatch({ type: "closeWatchedList" })}>
             {closeWatchedList ? "-" : "x"}
           </Button>
-
-          {!closeWatchedList && selectMovie ? (
-            <SelectedMovie.Provider value={{ dispatch }}>
-              <WatchMovieStatic />
-              <WatchMovieList selectMovie={selectMovie} dispatch={dispatch}  watchedMovie={watchedMovie}/>
+          {!closeWatchedList && selectMovie && (
+            <SelectedMovie.Provider
+              value={{ dispatch, selectMovie, watchedMovie, movieDetail }}
+            >
+              {movieDetail ? (
+                <MovieDetails />
+              ) : (
+                <>
+                  <WatchMovieStatic />
+                  <WatchMovieList />
+                </>
+              )}
             </SelectedMovie.Provider>
-          ) : null}
+          )}
         </MovieSection>
       </Main>
     </>

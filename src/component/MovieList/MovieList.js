@@ -8,7 +8,7 @@ const MovieList = ({ movieList }) => {
   return <ul className={styles.movieList}>
 {
 movieList.map((movie)=>{
-  return <MovieItem movieList={movie} />
+  return <MovieItem movieList={movie} key={movie.imdbID}/>
 })
 }
   </ul>;
