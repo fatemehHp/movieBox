@@ -1,37 +1,39 @@
-.rate {
-    color: #e63946;
-    font-weight: bold;
-  }
+
   
-  .runTime {
-    color: #1d3557;
-  }
+ 
   .movieItem {
     display: flex;
-    align-items: center;
-    border-bottom: 1px solid #ccc;
-    padding: 20px 0px;
     cursor: pointer;
-
+    background-color: #0D0D0D;
+    border-radius: 1rem;
+    gap: 5px;
+    padding: 0.3rem
   }
   
+
   .movieItemImage {
-    width: 60px;
-    height: 90px;
-    border-radius: 5px;
-    background-color: #ddd;
-    margin-right: 1rem;
+    width: 100px;
+    border-radius: 1rem;
+
+    object-fit: cover;
   }
+  
   
   .movieItemInfo {
-    display: flex;
+    display: grid;
+    flex-direction: column;
     gap: 0.5rem;
+    padding: 0.3rem;
+    align-content: space-around;
   }
   
   .movieItemTitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
-    color: #333;
+    color: #fff;
+    display: flex;
+    gap: 10px;
+    align-items: center
   }
   
   .movieItemDate {
@@ -41,4 +43,20 @@
     align-items: center;
     gap: 0.5rem;
   }
+  .movieItemTitle span {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+  }
   
+  
+  span {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #d1d1d1;
+    margin: 0;  display: flex;
+    gap:5px;
+    align-items: center
+  
+  }
+ 

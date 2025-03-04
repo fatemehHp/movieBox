@@ -140,7 +140,7 @@ const App = () => {
               ) : status === "receiveData" ? (
                 <MovieList movieList={movieList} />
               ) : status === "resetData" ? (
-                <p>search movie name</p>
+                <p style={{color:"#fff"}}>search movie name</p>
               ) : null)}
           </MovieSection>
         </SelectedMovie.Provider>

@@ -1,13 +1,11 @@
 .movieSectionButton, .watchedMoviesButton {
-    margin-bottom: 1rem;
-    color: #000000;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 20px;
-    margin-left: 99%;
-  }
-.movieSectionButton:hover {
-color: red
+  margin-bottom: 1rem;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 28px;
+  margin-left: 99%;
+  background: transparent;
   }
